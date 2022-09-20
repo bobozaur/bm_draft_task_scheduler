@@ -1,5 +1,3 @@
-pub mod database;
-
 use rocket::{
     delete, get,
     http::Status,

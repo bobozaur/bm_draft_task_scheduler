@@ -1,5 +1,5 @@
 [package]
-name = "worker"
+name = "database"
 version = "0.1.0"
 edition = "2021"
 
@@ -23,16 +23,9 @@ features = [
 [dependencies.thiserror]
 version = "1.0.35"
 
-[dependencies.chrono]
-version = "0.4.22"
-features = ["serde"]
-
 [dependencies.uuid]
 version = "1.1.2"
 features = ["serde", "v4"]
 
 [dependencies.task]
 path = "../task"
-
-[dependencies.database]
-path = "../database"

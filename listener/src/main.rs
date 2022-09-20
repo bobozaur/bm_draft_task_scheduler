@@ -1,6 +1,5 @@
-use listener::{
-    create_task, database::Database, delete_task, retrieve_filtered_tasks, retrieve_task,
-};
+use database::Database;
+use listener::{create_task, delete_task, retrieve_filtered_tasks, retrieve_task};
 use rocket::{launch, routes};
 
 #[launch]

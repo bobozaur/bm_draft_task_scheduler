@@ -29,3 +29,6 @@ features = ["serde", "v4"]
 
 [dependencies.task]
 path = "../task"
+
+[dependencies.database]
+path = "../database"
