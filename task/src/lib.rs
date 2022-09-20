@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter, Result as FmtResult};
+
 use chrono::NaiveDateTime;
 use rocket::{
     serde::{uuid::Uuid, Deserialize, Serialize},
@@ -14,6 +16,12 @@ pub enum TaskType {
     C,
 }
 
+impl Display for TaskType {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{}", self.as_ref())
+    }
+}
+
 #[derive(AsRefStr, Clone, Copy, Deserialize, Debug, FromFormField, Serialize, Type)]
 #[serde(crate = "rocket::serde")]
 pub enum TaskState {
@@ -22,13 +30,19 @@ pub enum TaskState {
     Finished,
 }
 
+impl Display for TaskState {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{}", self.as_ref())
+    }
+}
+
 impl Default for TaskState {
     fn default() -> Self {
         Self::Created
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(crate = "rocket::serde")]
 pub struct Task {
     #[serde(default = "Uuid::new_v4")]
