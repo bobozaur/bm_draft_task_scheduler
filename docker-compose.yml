@@ -1,0 +1,11 @@
+# base docker-compose configuration
+# for different environments
+# use override configurations to customize
+version: '3.8'
+services:
+  pgdb:
+    image: postgres:14.5
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    ports:
+      - "5432:5432"

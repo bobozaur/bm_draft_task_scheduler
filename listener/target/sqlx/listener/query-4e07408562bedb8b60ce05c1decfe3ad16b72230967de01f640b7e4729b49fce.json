@@ -1,0 +1,13 @@
+{
+  "query": "\n            DELETE FROM Tasks\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "709427acd80fe1f285aa3a8ade2ea9363e3a0b7be797d6fb4d23a1c0549663c4"
+}

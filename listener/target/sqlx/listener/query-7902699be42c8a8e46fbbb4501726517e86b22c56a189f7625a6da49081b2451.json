@@ -1,0 +1,40 @@
+{
+  "query": "\n            SELECT\n                id,\n                task_type as \"task_type: TaskType\",\n                task_state as \"task_state: TaskState\",\n                sched_datetime\n            FROM Tasks\n            WHERE task_type = CASE WHEN $1::text IS NULL THEN task_type ELSE $1 END\n              OR task_state = CASE WHEN $2::text IS NULL THEN task_type ELSE $2 END\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "task_type: TaskType",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "task_state: TaskState",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "sched_datetime",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "7e6cf2e3878369fdc2270da2fb832187981297d9617493e081f14356cbe93ce4"
+}
