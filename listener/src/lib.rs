@@ -1,5 +1,4 @@
 pub mod database;
-mod task;
 
 use rocket::{
     delete, get,

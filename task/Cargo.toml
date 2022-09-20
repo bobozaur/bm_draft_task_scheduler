@@ -1,5 +1,5 @@
 [package]
-name = "listener"
+name = "task"
 version = "0.1.0"
 edition = "2021"
 
@@ -23,9 +23,13 @@ features = [
 [dependencies.thiserror]
 version = "1.0.35"
 
+[dependencies.chrono]
+version = "0.4.22"
+features = ["serde"]
+
+[dependencies.strum_macros]
+version = "0.24.3"
+
 [dependencies.uuid]
 version = "1.1.2"
 features = ["serde", "v4"]
-
-[dependencies.task]
-path = "../task"
