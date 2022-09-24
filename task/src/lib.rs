@@ -25,9 +25,11 @@ impl Display for TaskType {
 #[derive(AsRefStr, Clone, Copy, Deserialize, Debug, FromFormField, Serialize, Type)]
 #[serde(crate = "rocket::serde")]
 pub enum TaskState {
-    Created,
+    Open,
     Running,
-    Finished,
+    Aborted,
+    Failed,
+    Successful,
 }
 
 impl Display for TaskState {
@@ -38,7 +40,7 @@ impl Display for TaskState {
 
 impl Default for TaskState {
     fn default() -> Self {
-        Self::Created
+        Self::Open
     }
 }
 

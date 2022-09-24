@@ -1,50 +1,61 @@
+use std::time::Duration;
+
 use database::Database;
 use rocket::{
-    tokio::{
-        main,
-        time::{self, Duration},
-    },
+    tokio::{main, time},
     Config,
 };
-use task::Task;
-use worker::ProcessTask;
+use worker::worker_task::WorkerTask;
 
-#[main(flavor = "current_thread")]
+const MAX_TASKS_NUM: usize = 5;
+
+// Using a multithreaded runtime environment allows
+// for multiple tasks to be processed in parallel, on different threads.
+//
+// A single-threaded runtime environment would still be possible,
+// depending on what the tasks should do.
+// E.g: if tasks are I/O intensive, we'd still benefit from
+// spawning multiple tasks at the same time and have them get processed
+// concurrently on the same thread.
+#[main]
 async fn main() {
     let conf = Config::figment();
-    let pool = Database::connect(&conf, rocket::Config::LOG_LEVEL, 1)
+    let pool = Database::connect(&conf, rocket::Config::LOG_LEVEL, MAX_TASKS_NUM)
         .await
         .expect("Worker could not connect to the database!");
 
     loop {
-        let mut transaction = pool
-            .begin()
-            .await
-            .expect("Worker could not start a database transaction");
+        let mut running_tasks = Vec::with_capacity(MAX_TASKS_NUM);
 
-        let task = Task::get_open_task(&mut transaction)
-            .await
-            .expect("Worker could not retrieve task!");
+        for _ in 0..MAX_TASKS_NUM {
+            let opt_task = match WorkerTask::get_open_task(&pool).await {
+                Ok(task) => task,
+                Err(e) => {
+                    eprintln!("{}", e);
+                    // We can pretend that we didn't find
+                    // a task after logging the error
+                    None
+                }
+            };
 
-        if let Some(task) = task {
-            task.set_running(&mut transaction)
-                .await
-                .expect("Worker could not update task!");
-
-            time::sleep(Duration::from_secs(5)).await;
-            println!("Ran task ID: {} - type: {}", task.id, task.task_type);
-
-            task.set_finished(&mut transaction)
-                .await
-                .expect("Worker could not update task!");
-        } else {
-            // Just to be sensible, we'll sleep half a second if we don't find a task.
-            time::sleep(Duration::from_millis(500)).await;
+            if let Some(task) = opt_task {
+                match task.start().await {
+                    Ok(running) => running_tasks.push(running),
+                    Err(e) => eprintln!("{}", e),
+                }
+            } else {
+                // We'll sleep a bit if no task to process was found.
+                time::sleep(Duration::from_millis(500)).await;
+            }
         }
 
-        transaction
-            .commit()
-            .await
-            .expect("Worker could not commit transaction!");
+        for task in running_tasks {
+            let result = task.finish().await.and_then(|t| t.into_result());
+
+            match result {
+                Ok(_) => {}
+                Err(e) => eprintln!("{}", e),
+            }
+        }
     }
 }
